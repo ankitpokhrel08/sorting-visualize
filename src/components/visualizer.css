@@ -1,0 +1,135 @@
+/* Import Poppins font from Google Fonts */
+@import url("https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap");
+
+/* Apply Poppins font globally */
+body {
+  font-family: "Poppins", sans-serif;
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+.visualizer-container {
+  width: 100%;
+  max-width: 1200px;
+  margin: 20px auto;
+  text-align: center;
+  padding: 0 10px; /* Add padding for small screens */
+  box-sizing: border-box;
+}
+
+/* Control panel styling */
+.controls {
+  display: flex;
+  gap: 15px;
+  flex-wrap: wrap;
+  justify-content: flex-start;
+  align-items: center;
+  margin-bottom: 20px;
+  flex: 1;
+}
+
+.controls select,
+.controls button {
+  padding: 12px 18px;
+  font-size: 16px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.3s ease-in-out;
+  margin-bottom: 10px;
+  width: 150px; /* Control width for uniformity */
+}
+
+.controls button {
+  background-color: #007bff;
+  color: white;
+  border: none;
+  width: 170px;
+}
+
+.controls button:hover {
+  background-color: #0056b3;
+}
+
+/* Dropdown appearance and interaction (modern style) */
+.controls select {
+  background-color: #f7f7f7;
+  color: #333;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+}
+
+.controls select:focus {
+  outline: none;
+  border-color: #007bff;
+}
+
+/* Array container styling */
+.array-container {
+  display: flex;
+  justify-content: center;
+  align-items: flex-end;
+  height: 300px;
+  border: 1px solid #ddd;
+  background-color: #f7f7f7;
+  padding: 10px;
+  flex-wrap: wrap; /* Allow bars to wrap on small screens */
+  gap: 5px;
+  margin-top: 20px;
+}
+
+/* Individual array bar styling */
+.array-bar {
+  width: 30px;
+  margin: 0 5px;
+  background-color: #4caf50;
+  transition: all 0.3s ease;
+  border-radius: 5px;
+}
+
+/* Hover effect on bars */
+.array-bar:hover {
+  background-color: #45a049;
+}
+
+/* Media queries for responsiveness */
+@media (max-width: 768px) {
+  /* On smaller screens, control panel items stack vertically and shift to top */
+  .controls {
+    flex-direction: column;
+    align-items: center;
+    margin-bottom: 20px;
+  }
+
+  .controls select,
+  .controls button {
+    width: 100%; /* Full width for dropdown and buttons */
+    font-size: 14px;
+    padding: 10px 15px;
+  }
+
+  /* Array container adjustment for smaller screens */
+  .array-container {
+    height: 250px; /* Reduce height on mobile for better fit */
+    flex-direction: row;
+    justify-content: center;
+  }
+
+  .array-bar {
+    width: 20px; /* Smaller bars for mobile */
+  }
+}
+
+@media (max-width: 480px) {
+  .controls select,
+  .controls button {
+    width: 100%; /* Full width on very small screens */
+    font-size: 14px;
+    padding: 10px 15px;
+  }
+
+  .array-bar {
+    width: 15px; /* Even smaller bars on very small screens */
+  }
+}
