@@ -52,6 +52,15 @@ body {
   background-color: #0056b3;
 }
 
+/* Add styles for the cancel button */
+.controls button:last-child {
+  background-color: #dc3545;
+}
+
+.controls button:last-child:hover {
+  background-color: #c82333;
+}
+
 /* Dropdown appearance and interaction (modern style) */
 .controls select {
   background-color: #f7f7f7;

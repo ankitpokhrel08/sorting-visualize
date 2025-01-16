@@ -1,11 +1,12 @@
-import { useState } from "react";
+import { useState, useRef } from "react";
 import "./visualizer.css";
 
 const Visualizer = () => {
   const [array, setArray] = useState([50, 40, 70, 20, 90, 30, 60, 80, 10, 100]);
-  const [isSorting, setIsSorting] = useState(false); // Prevent interaction during sorting
+  const [isSorting, setIsSorting] = useState(false);
   const [algorithm, setAlgorithm] = useState("quickSort");
   const [speed, setSpeed] = useState(2);
+  const timeoutIds = useRef([]); // Store timeout IDs for cancellation
 
   const generateNewArray = () => {
     if (isSorting) return;
@@ -33,7 +34,7 @@ const Visualizer = () => {
         mergeSort([...array]);
         break;
       case "quickSort":
-        quickSort([...array], 0, array.length - 1);
+        quickSort([...array]);
         break;
       case "heapSort":
         heapSort([...array]);
@@ -47,6 +48,16 @@ const Visualizer = () => {
       default:
         alert("Algorithm not implemented yet!");
         break;
+    }
+  };
+
+  const cancelVisualization = () => {
+    timeoutIds.current.forEach((id) => clearTimeout(id));
+    timeoutIds.current = [];
+    setIsSorting(false);
+    const bars = document.getElementsByClassName("array-bar");
+    for (let bar of bars) {
+      bar.style.backgroundColor = "#4caf50";
     }
   };
 
@@ -105,61 +116,40 @@ const Visualizer = () => {
   const mergeSort = (arr) => {
     setIsSorting(true);
     const animations = [];
-    const merge = (start, mid, end) => {
-      let left = arr.slice(start, mid + 1);
-      let right = arr.slice(mid + 1, end + 1);
-      let i = 0,
-        j = 0,
-        k = start;
+
+    const merge = (left, right) => {
+      let sortedArray = [];
+      let i = 0, j = 0;
+
       while (i < left.length && j < right.length) {
-        animations.push([k, k + 1]); // Compare
+        animations.push([i, j]); // Compare
         if (left[i] <= right[j]) {
-          arr[k++] = left[i++];
+          sortedArray.push(left[i++]);
         } else {
-          arr[k++] = right[j++];
+          sortedArray.push(right[j++]);
         }
       }
-      while (i < left.length) arr[k++] = left[i++];
-      while (j < right.length) arr[k++] = right[j++];
+
+      while (i < left.length) sortedArray.push(left[i++]);
+      while (j < right.length) sortedArray.push(right[j++]);
+
+      return sortedArray;
     };
 
-    const mergeSortHelper = (start, end) => {
-      if (start < end) {
-        const mid = Math.floor((start + end) / 2);
-        mergeSortHelper(start, mid);
-        mergeSortHelper(mid + 1, end);
-        merge(start, mid, end);
-      }
+    const mergeSortHelper = (arr) => {
+      if (arr.length <= 1) return arr;
+
+      const mid = Math.floor(arr.length / 2);
+      const left = mergeSortHelper(arr.slice(0, mid));
+      const right = mergeSortHelper(arr.slice(mid));
+
+      return merge(left, right);
     };
 
-    mergeSortHelper(0, arr.length - 1);
-    animateSorting(animations, arr);
+    const sortedArray = mergeSortHelper(arr);
+    animateSorting(animations, sortedArray);
   };
 
-  // const quickSort = (arr, low, high) => {
-  //   if (low < high) {
-  //     const partition = (low, high) => {
-  //       let pivot = arr[high];
-  //       let i = low - 1;
-  //       for (let j = low; j < high; j++) {
-  //         animations.push([j, high]); // Compare
-  //         if (arr[j] < pivot) {
-  //           i++;
-  //           animations.push([i, j, true]); // Swap
-  //           [arr[i], arr[j]] = [arr[j], arr[i]];
-  //         }
-  //       }
-  //       animations.push([i + 1, high, true]); // Swap
-  //       [arr[i + 1], arr[high]] = [arr[high], arr[i + 1]];
-  //       return i + 1;
-  //     };
-
-  //     const pivotIndex = partition(low, high);
-  //     quickSort(arr, low, pivotIndex - 1);
-  //     quickSort(arr, pivotIndex + 1, high);
-  //   }
-  //   animateSorting(animations, arr);
-  // };
   const quickSort = (arr) => {
     setIsSorting(true);
     const animations = []; // Initialize animations array
@@ -267,7 +257,7 @@ const Visualizer = () => {
     const animationSpeed = speedMap[speed];
 
     animations.forEach((animation, index) => {
-      setTimeout(() => {
+      const timeoutId = setTimeout(() => {
         const bars = document.getElementsByClassName("array-bar");
 
         if (animation.length === 2) {
@@ -286,10 +276,11 @@ const Visualizer = () => {
           bars[barTwoIdx].style.backgroundColor = "green";
         }
       }, index * animationSpeed);
+      timeoutIds.current.push(timeoutId);
     });
 
     // Reset state after sorting
-    setTimeout(() => {
+    const resetTimeoutId = setTimeout(() => {
       setArray(finalArray);
       const bars = document.getElementsByClassName("array-bar");
       for (let bar of bars) {
@@ -297,6 +288,7 @@ const Visualizer = () => {
       }
       setIsSorting(false);
     }, animations.length * animationSpeed);
+    timeoutIds.current.push(resetTimeoutId);
   };
 
   return (
@@ -318,11 +310,11 @@ const Visualizer = () => {
           <option value="insertionSort">Insertion Sort</option>
           <option value="selectionSort">Selection Sort</option>
           <option value="bubbleSort">Bubble Sort</option>
-          <option value="mergeSort">Merge Sort</option>
+          {/* <option value="mergeSort">Merge Sort</option> */}
           <option value="quickSort">Quick Sort</option>
-          <option value="heapSort">Heap Sort</option>
-          <option value="radixSort">Radix Sort</option>
-          <option value="shellSort">Shell Sort</option>
+          {/* <option value="heapSort">Heap Sort</option> */}
+          {/* <option value="radixSort">Radix Sort</option> */}
+          {/* <option value="shellSort">Shell Sort</option> */}
         </select>
 
         <label htmlFor="speed">Speed:</label>
@@ -340,6 +332,9 @@ const Visualizer = () => {
 
         <button onClick={visualizeSorting} disabled={isSorting}>
           Visualize
+        </button>
+        <button onClick={cancelVisualization} disabled={!isSorting}>
+          Cancel
         </button>
       </div>
 
